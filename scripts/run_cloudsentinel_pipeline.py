@@ -50,12 +50,13 @@ def main() -> None:
         result = pipeline.process(incident)
 
         print(
-            f"{incident['incident_type']:<22} → "
-            f"{result['status']:<8} | "
-            f"{result['incident_type']:<22} | "
-            f"{result['severity']:<8} | "
-            f"score={result['anomaly_score']:.4f}"
-        )
+    f"{incident['incident_type']:<22} → "
+    f"{result['status']:<8} | "
+    f"{result['incident_type']:<22} | "
+    f"{result['severity']:<8} | "
+    f"confidence={result['confidence']:.2f} | "
+    f"score={result['anomaly_score']:.4f}"
+)
 
 
 
