@@ -20,11 +20,14 @@ class CloudAnomalyDetector:
     """
     Detect unusual cloud-service behavior using Isolation Forest.
 
-    Expected features:
-        1. request_count
-        2. error_count
-        3. average_latency_ms
-        4. average_duration_ms
+   Expected features:
+    1. request_count
+    2. error_count
+    3. average_latency_ms
+    4. p95_latency_ms
+    5. average_duration_ms
+    6. timeout_count
+    7. throttle_count
     """
 
     def __init__(
