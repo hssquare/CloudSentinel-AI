@@ -20,15 +20,17 @@ class CloudAnomalyDetector:
     """
     Detect unusual cloud-service behavior using Isolation Forest.
 
-   Expected features:
-    1. request_count
-    2. error_count
-    3. average_latency_ms
-    4. p95_latency_ms
-    5. average_duration_ms
-    6. timeout_count
-    7. throttle_count
+    Expected features:
+        1. request_count
+        2. error_count
+        3. average_latency_ms
+        4. p95_latency_ms
+        5. average_duration_ms
+        6. timeout_count
+        7. throttle_count
     """
+
+    EXPECTED_FEATURE_COUNT = 7
 
     def __init__(
         self,
@@ -36,7 +38,9 @@ class CloudAnomalyDetector:
         random_state: int = 42,
     ) -> None:
         if not 0 < contamination < 0.5:
-            raise ValueError("contamination must be between 0 and 0.5")
+            raise ValueError(
+                "contamination must be between 0 and 0.5"
+            )
 
         self.model = IsolationForest(
             contamination=contamination,
@@ -51,24 +55,50 @@ class CloudAnomalyDetector:
         data = np.asarray(training_data, dtype=float)
 
         if data.ndim != 2:
-            raise ValueError("training_data must be a 2D array")
+            raise ValueError(
+                "training_data must be a 2D array"
+            )
+
+        if data.shape[1] != self.EXPECTED_FEATURE_COUNT:
+            raise ValueError(
+                f"Expected {self.EXPECTED_FEATURE_COUNT} features, "
+                f"but received {data.shape[1]}"
+            )
 
         if len(data) < 10:
-            raise ValueError("At least 10 observations are recommended")
+            raise ValueError(
+                "At least 10 observations are recommended"
+            )
 
         self.model.fit(data)
         self._is_fitted = True
 
-    def predict(self, observation: Sequence[float]) -> AnomalyResult:
+    def predict(
+        self,
+        observation: Sequence[float],
+    ) -> AnomalyResult:
         """Classify an observation as NORMAL or ANOMALY."""
 
         if not self._is_fitted:
-            raise RuntimeError("Model must be fitted before prediction")
+            raise RuntimeError(
+                "Model must be fitted before prediction"
+            )
 
-        data = np.asarray(observation, dtype=float).reshape(1, -1)
+        data = np.asarray(
+            observation,
+            dtype=float,
+        ).reshape(1, -1)
+
+        if data.shape[1] != self.EXPECTED_FEATURE_COUNT:
+            raise ValueError(
+                f"Expected {self.EXPECTED_FEATURE_COUNT} features, "
+                f"but received {data.shape[1]}"
+            )
 
         prediction = self.model.predict(data)[0]
-        score = float(self.model.decision_function(data)[0])
+        score = float(
+            self.model.decision_function(data)[0]
+        )
 
         is_anomaly = prediction == -1
 
